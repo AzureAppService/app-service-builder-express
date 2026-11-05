@@ -1,8 +1,9 @@
 {
-  "name": "backend-node-express",
+  "name": "app-service-builder-express",
   "version": "1.0.0",
   "private": true,
-  "description": "Conventional Express backend used to evaluate Builder Apps startup detection.",
+  "description": "Express 5 backend sample for Azure App Service Builder.",
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=20"

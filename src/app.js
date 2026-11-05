@@ -30,7 +30,7 @@ function page(title, content) {
   </head>
   <body>
     <main>
-      <p class="eyebrow">Builder Apps shape test</p>
+      <p class="eyebrow">App Service Builder / Express</p>
       <h1>${title}</h1>
       ${content}
       <dl>

@@ -10,7 +10,7 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
 const server = createServer(createApp());
 
 server.listen(port, "0.0.0.0", () => {
-  console.log(`backend-node-express listening on port ${port}`);
+  console.log(`app-service-builder-express listening on port ${port}`);
 });
 
 function shutdown(signal) {

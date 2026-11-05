@@ -25,6 +25,7 @@ test("serves the landing page and deep route", async () => {
   const deepRoute = await fetch(`${baseUrl}/products/widget-1`);
 
   assert.equal(home.status, 200);
+  assert.match(home.headers.get("content-type"), /text\/html/);
   assert.match(await home.text(), /Express backend is running/);
   assert.equal(deepRoute.status, 200);
   assert.match(await deepRoute.text(), /Widget 1/);
@@ -35,10 +36,26 @@ test("reports health and deployment identity", async () => {
   const version = await fetch(`${baseUrl}/api/version`).then((response) => response.json());
 
   assert.equal(health.status, "ok");
-  assert.equal(health.app, "backend-node-express");
-  assert.equal(version.app, "backend-node-express");
+  assert.equal(health.app, "app-service-builder-express");
+  assert.equal(version.app, "app-service-builder-express");
   assert.match(version.framework, /^Express /);
   assert.match(version.runtime, /^v\d+/);
+});
+
+test("reports API availability and serves the stylesheet", async () => {
+  const status = await fetch(`${baseUrl}/api/status`);
+  const stylesheet = await fetch(`${baseUrl}/assets/styles.v1.css`);
+
+  assert.equal(status.status, 200);
+  assert.match(status.headers.get("content-type"), /application\/json/);
+  const body = await status.json();
+  assert.equal(body.status, "available");
+  assert.ok(Number.isFinite(Date.parse(body.timestamp)));
+
+  assert.equal(stylesheet.status, 200);
+  assert.match(stylesheet.headers.get("content-type"), /text\/css/);
+  assert.match(stylesheet.headers.get("cache-control"), /immutable/);
+  assert.match(await stylesheet.text(), /:root/);
 });
 
 test("returns safe request metadata", async () => {

@@ -36,7 +36,9 @@ Assert-Response -Path "/" -ExpectedStatus 200 -ExpectedContent "Express backend 
 Assert-Response -Path "/products/widget-1" -ExpectedStatus 200 -ExpectedContent "Widget 1"
 Assert-Response -Path "/health" -ExpectedStatus 200 -ExpectedContent '"status":"ok"'
 Assert-Response -Path "/api/status" -ExpectedStatus 200 -ExpectedContent '"status":"available"'
-Assert-Response -Path "/api/version" -ExpectedStatus 200 -ExpectedContent '"app":"backend-node-express"'
+Assert-Response -Path "/api/version" -ExpectedStatus 200 -ExpectedContent '"app":"app-service-builder-express"'
+Assert-Response -Path "/api/request" -ExpectedStatus 200 -ExpectedContent '"method":"GET"'
+Assert-Response -Path "/assets/styles.v1.css" -ExpectedStatus 200 -ExpectedContent ":root"
 Assert-Response -Path "/missing-page" -ExpectedStatus 404 -ExpectedContent "Page not found"
 Assert-Response -Path "/api/missing" -ExpectedStatus 404 -ExpectedContent '"error":"not_found"'
 
