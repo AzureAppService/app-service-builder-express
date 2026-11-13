@@ -38,11 +38,14 @@ test("root actions keep health inline and customization local", async () => {
   assert.match(html, /role="status"/);
   assert.match(html, /<summary>Customize this sample<\/summary>/);
   assert.match(html, /In your fork/);
-  assert.match(html, /href="https:\/\/expressjs.com\/">Framework documentation/);
+  assert.match(html, /href="https:\/\/expressjs.com\/">Express documentation/);
+  assert.match(html, /href="https:\/\/nodejs.org\/en\/docs">Node.js documentation/);
   assert.match(html, /href="https:\/\/builder.appservice.azure.com\/docs\/">App Service Builder documentation/);
-  for (const asset of ["/assets/styles.v2.css", "/assets/health.v1.js"]) {
+  for (const asset of ["/assets/styles.v2.css", "/assets/health.v1.js", "/assets/brand/family.v1.css", "/assets/brand/builder.svg", "/assets/brand/nodejs.svg"]) {
     assert.ok(html.includes(asset));
-    assert.equal((await fetch(`${baseUrl}${asset}`)).status, 200);
+    const response = await fetch(`${baseUrl}${asset}`);
+    assert.equal(response.status, 200);
+    assert.ok((await response.arrayBuffer()).byteLength > 0);
   }
 });
 
@@ -75,6 +78,14 @@ test("inline health verifies the app and recovers from failure", async () => {
     assert.equal(button.disabled, false);
     assert.match(result.textContent, expected);
   }
+});
+
+test("revalidates the editable family stylesheet after redeployment", async () => {
+  const stylesheet = await fetch(`${baseUrl}/assets/brand/family.v1.css`);
+  assert.equal(stylesheet.status, 200);
+  assert.match(stylesheet.headers.get("content-type"), /text\/css/);
+  assert.equal(stylesheet.headers.get("cache-control"), "public, max-age=0, must-revalidate");
+  assert.ok(stylesheet.headers.get("etag"));
 });
 
 test("reports health and deployment identity", async () => {

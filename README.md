@@ -16,8 +16,21 @@ local tests do not establish cloud deployment success or regional availability.
 
 ![Express root page with sample actions, inline health feedback, customization help, and local application details](docs/images/sample.png)
 
-Rendered locally at `/` with sample settings. This screenshot is not evidence of
+**LOCAL — Microsoft Edge, 1440px desktop, root `/`.** Rendered with sample settings. This screenshot is not evidence of
 an Azure deployment.
+
+The daylight surface keeps Express's server-rendered route and real inline health
+check. Edit `src/app.js` for content and `public/brand/family.v1.css` for the visual
+family; existing baseline styles remain in `public/styles.v2.css`.
+
+### Logo provenance
+
+`public/brand/builder.svg` is the supplied official App Service Builder mark.
+`public/brand/nodejs.svg` is the unmodified [official dark horizontal Node.js SVG](https://nodejs.org/static/logos/nodejsDark.svg),
+identifying Express's Node.js runtime, not an Express logo. Node.js is a trademark
+of the OpenJS Foundation; see [branding](https://nodejs.org/en/about/branding) and
+[trademark policy](https://trademark-policy.openjsf.org/). Logos identify the stack;
+no endorsement is implied.
 
 **Check app health** reads this app's `/health` JSON endpoint and displays the
 result in place, including failures and retry guidance. It does not report Azure

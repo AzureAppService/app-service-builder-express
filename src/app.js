@@ -4,6 +4,7 @@ import packageJson from "../package.json" with { type: "json" };
 
 const frameworkVersion = packageJson.dependencies.express;
 const publicDirectory = fileURLToPath(new URL("../public", import.meta.url));
+const familyStylesheet = fileURLToPath(new URL("../public/brand/family.v1.css", import.meta.url));
 
 function deploymentInfo() {
   return {
@@ -27,10 +28,21 @@ function page(title, content) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${title}</title>
     <link rel="stylesheet" href="/assets/styles.v2.css">
+    <link rel="stylesheet" href="/assets/brand/family.v1.css">
     <script type="module" src="/assets/health.v1.js"></script>
   </head>
   <body>
-    <main>
+    <main class="sample-sheet">
+      <header class="sample-header">
+        <a class="sample-brand" href="/"><img src="/assets/brand/builder.svg" alt="" width="32" height="32">App Service Builder</a>
+        <nav aria-label="Documentation">
+          <a href="https://expressjs.com/">Express documentation</a>
+          <a href="https://nodejs.org/en/docs">Node.js documentation</a>
+          <a href="https://builder.appservice.azure.com/docs/">App Service Builder documentation</a>
+        </nav>
+      </header>
+      <div class="sample-content">
+      <div class="ecosystem-logo"><img class="wordmark" src="/assets/brand/nodejs.svg" alt="Node.js" width="126" height="52"><span>Express</span></div>
       <p class="eyebrow">App Service Builder / Express</p>
       <h1>${title}</h1>
       ${content}
@@ -42,6 +54,7 @@ function page(title, content) {
         <div><dt>Build setting</dt><dd>${info.buildMarker}</dd></div>
         <div><dt>Runtime setting</dt><dd>${info.runtimeMarker}</dd></div>
       </dl>
+      </div>
     </main>
   </body>
 </html>`;
@@ -53,7 +66,12 @@ export function createApp() {
   app.disable("x-powered-by");
   app.use("/assets", express.static(publicDirectory, {
     immutable: true,
-    maxAge: "1y"
+    maxAge: "1y",
+    setHeaders(response, path) {
+      if (path === familyStylesheet) {
+        response.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
+      }
+    }
   }));
 
   app.get("/", (_request, response) => {
@@ -69,13 +87,16 @@ export function createApp() {
       <details>
         <summary>Customize this sample</summary>
         <p>In your fork, edit the home page title and content in <code>src/app.js</code>
-        and the styles in <code>public/styles.v2.css</code>. Commit your changes and
+        and the visual-family styles in <code>public/brand/family.v1.css</code>. Commit your changes and
         deploy your fork through your Builder App.</p>
       </details>
-      <nav class="documentation" aria-label="Documentation">
-        <a href="https://expressjs.com/">Framework documentation</a>
-        <a href="https://builder.appservice.azure.com/docs/">App Service Builder documentation</a>
-      </nav>`
+      <details>
+        <summary>Logo sources &amp; notices</summary>
+        <p>Unmodified <a href="https://nodejs.org/en/about/branding">Node.js artwork</a>
+        identifies the runtime used by Express. Node.js is a trademark of the OpenJS Foundation;
+        <a href="https://trademark-policy.openjsf.org/">trademark policy</a>.
+        App Service Builder uses its supplied official mark. No endorsement implied.</p>
+      </details>`
     ));
   });
 
