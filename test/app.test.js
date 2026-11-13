@@ -39,7 +39,7 @@ test("root actions keep health inline and customization local", async () => {
   assert.match(html, /<summary>Customize this sample<\/summary>/);
   assert.match(html, /In your fork/);
   assert.match(html, /href="https:\/\/expressjs.com\/">Framework documentation/);
-  assert.match(html, /href="https:\/\/builderapps.azure.com\/docs\/">App Service Builder documentation/);
+  assert.match(html, /href="https:\/\/builder.appservice.azure.com\/docs\/">App Service Builder documentation/);
   for (const asset of ["/assets/styles.v2.css", "/assets/health.v1.js"]) {
     assert.ok(html.includes(asset));
     assert.equal((await fetch(`${baseUrl}${asset}`)).status, 200);
