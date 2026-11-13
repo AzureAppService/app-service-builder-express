@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { after, before, test } from "node:test";
+import { runInNewContext } from "node:vm";
 import { createApp } from "../src/app.js";
 
 let baseUrl;
@@ -29,6 +30,51 @@ test("serves the landing page and deep route", async () => {
   assert.match(await home.text(), /Express backend is running/);
   assert.equal(deepRoute.status, 200);
   assert.match(await deepRoute.text(), /Widget 1/);
+});
+
+test("root actions keep health inline and customization local", async () => {
+  const html = await fetch(`${baseUrl}/`).then((response) => response.text());
+  assert.match(html, /<button[^>]+data-health-app="app-service-builder-express">Check app health/);
+  assert.match(html, /role="status"/);
+  assert.match(html, /<summary>Customize this sample<\/summary>/);
+  assert.match(html, /In your fork/);
+  assert.match(html, /href="https:\/\/expressjs.com\/">Framework documentation/);
+  assert.match(html, /href="https:\/\/builderapps.azure.com\/docs\/">App Service Builder documentation/);
+  for (const asset of ["/assets/styles.v2.css", "/assets/health.v1.js"]) {
+    assert.ok(html.includes(asset));
+    assert.equal((await fetch(`${baseUrl}${asset}`)).status, 200);
+  }
+});
+
+test("inline health verifies the app and recovers from failure", async () => {
+  const script = await fetch(`${baseUrl}/assets/health.v1.js`).then((response) => response.text());
+  for (const [response, expected] of [
+    [new Response('{"status":"ok","app":"app-service-builder-express"}'), /responded successfully/],
+    [new Response('{"status":"ok","app":"another-app"}'), /check failed/],
+    [new Response("Unavailable", { status: 503 }), /check failed/],
+    [new Response("not JSON"), /check failed/],
+  ]) {
+    let click;
+    const button = {
+      dataset: { healthApp: "app-service-builder-express" },
+      addEventListener: (_event, callback) => { click = callback; },
+    };
+    const result = { textContent: "" };
+    runInNewContext(script, {
+      document: { querySelector: (selector) => selector === '[data-health-app]' ? button : result },
+      AbortSignal,
+      fetch: async (url, options) => {
+        assert.equal(url, "/health");
+        assert.equal(options.cache, "no-store");
+        return response;
+      },
+    });
+    const pending = click();
+    assert.equal(button.disabled, true);
+    await pending;
+    assert.equal(button.disabled, false);
+    assert.match(result.textContent, expected);
+  }
 });
 
 test("reports health and deployment identity", async () => {
