@@ -8,7 +8,7 @@ Never use secrets as public deployment markers.
 
 Do not report security vulnerabilities in public GitHub issues or pull requests.
 Follow the
-[Microsoft Security Response Center reporting guidance](https://www.microsoft.com/msrc/how-to-report-a-vulnerability).
+[Microsoft Security Response Center reporting portal](https://msrc.microsoft.com/report/vulnerability).
 
 Include affected versions, reproduction steps, and the potential impact in
 your private report. Do not include real credentials or unrelated private data.
